@@ -9,9 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllCats = exports.CatArgs = exports.Cats = exports.Cat = void 0;
+exports.GetCatsArgs = exports.AddCatInput = exports.Cat = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
+const log_access_1 = require("../../middlewares/log-access");
 // import { Basic, GeneralResource } from "../../resource/generalType";
 let Cat = class Cat {
 };
@@ -28,6 +29,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     (0, type_graphql_1.Field)(() => type_graphql_1.Int),
+    (0, type_graphql_1.UseMiddleware)(log_access_1.LogAccessMiddleware),
     __metadata("design:type", Number)
 ], Cat.prototype, "age", void 0);
 __decorate([
@@ -60,65 +62,56 @@ Cat = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], Cat);
 exports.Cat = Cat;
-let Cats = class Cats {
-};
-__decorate([
-    (0, type_graphql_1.Field)(() => [Cat]),
-    __metadata("design:type", Array)
-], Cats.prototype, "cats", void 0);
-Cats = __decorate([
-    (0, type_graphql_1.ObjectType)()
-], Cats);
-exports.Cats = Cats;
-let CatArgs = 
+// @ObjectType()
+// export class Cats {
+//   @Field(() => [Cat])
+//   cats!: Cat[];
+// }
+let AddCatInput = 
 // export class CatArgs implements Partial<GeneralResource>  {
-class CatArgs {
+class AddCatInput {
 };
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], CatArgs.prototype, "name", void 0);
+], AddCatInput.prototype, "name", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => type_graphql_1.Int),
     __metadata("design:type", Number)
-], CatArgs.prototype, "age", void 0);
+], AddCatInput.prototype, "age", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], CatArgs.prototype, "breed", void 0);
+], AddCatInput.prototype, "breed", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], CatArgs.prototype, "color", void 0);
+], AddCatInput.prototype, "color", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => type_graphql_1.Int),
     __metadata("design:type", Number)
-], CatArgs.prototype, "energyLevel", void 0);
+], AddCatInput.prototype, "energyLevel", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => [String]),
     __metadata("design:type", Array)
-], CatArgs.prototype, "temperament", void 0);
-CatArgs = __decorate([
-    (0, type_graphql_1.ArgsType)()
+], AddCatInput.prototype, "temperament", void 0);
+AddCatInput = __decorate([
+    (0, type_graphql_1.InputType)()
     // export class CatArgs implements Partial<GeneralResource>  {
-], CatArgs);
-exports.CatArgs = CatArgs;
-let GetAllCats = class GetAllCats {
-    constructor() {
-        this.skip = 0;
-        this.take = 10;
-    }
+], AddCatInput);
+exports.AddCatInput = AddCatInput;
+let GetCatsArgs = class GetCatsArgs {
 };
 __decorate([
     (0, type_graphql_1.Field)(() => type_graphql_1.Int),
     __metadata("design:type", Number)
-], GetAllCats.prototype, "skip", void 0);
+], GetCatsArgs.prototype, "skip", void 0);
 __decorate([
     (0, type_graphql_1.Field)(() => type_graphql_1.Int),
     __metadata("design:type", Number)
-], GetAllCats.prototype, "take", void 0);
-GetAllCats = __decorate([
+], GetCatsArgs.prototype, "take", void 0);
+GetCatsArgs = __decorate([
     (0, type_graphql_1.ArgsType)()
-], GetAllCats);
-exports.GetAllCats = GetAllCats;
+], GetCatsArgs);
+exports.GetCatsArgs = GetCatsArgs;
 //# sourceMappingURL=CatType.js.map

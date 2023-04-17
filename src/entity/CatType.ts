@@ -1,6 +1,7 @@
 
-import { ArgsType, Field, Int, ObjectType } from "type-graphql";
+import { ArgsType, InputType, Field, Int, ObjectType, UseMiddleware } from "type-graphql";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { LogAccessMiddleware } from "../../middlewares/log-access"
 // import { Basic, GeneralResource } from "../../resource/generalType";
 
 @Entity()
@@ -16,6 +17,7 @@ export class Cat {
 
   @Column()
   @Field(() => Int)
+  @UseMiddleware(LogAccessMiddleware)
   age!: number;
 
   @Column()
@@ -39,15 +41,15 @@ export class Cat {
   temperament!: string[];
 }
 
-@ObjectType()
-export class Cats {
-  @Field(() => [Cat])
-  cats!: Cat[];
-}
+// @ObjectType()
+// export class Cats {
+//   @Field(() => [Cat])
+//   cats!: Cat[];
+// }
 
-@ArgsType()
+@InputType()
 // export class CatArgs implements Partial<GeneralResource>  {
-export class CatArgs {
+export class AddCatInput {
   @Field()
   name!: string;
 
@@ -68,10 +70,10 @@ export class CatArgs {
 }
 
 @ArgsType()
-export class GetAllCats {
+export class GetCatsArgs {
   @Field(() => Int)
-  skip: number = 0;
+  skip: number;
 
   @Field(() => Int)
-  take: number = 10;
+  take: number;
 }

@@ -3,12 +3,13 @@ import { ApolloServer } from "apollo-server";
 import { buildSchema } from "type-graphql";
 import { CatResolver } from "./src/resolvers/CatResolver";
 import { AppDataSource } from "./src/data-source";
-// import { Container } from "typedi";
-// import path from "node:path";
-// import { Context } from "./authorization/contex.interface";
-// import { ErrorLoggerMiddleware} from "./middlewares/error-logger"
-// import { ResolveTimeMiddleware} from "./middlewares/resolve-time"
-// import { authChecker } from "./authorization/auth-checker";
+import { Container } from "typedi";
+import path from "node:path";
+import { Context } from "./authorization/contex.interface";
+import { ErrorLoggerMiddleware} from "./middlewares/error-logger"
+import { ResolveTimeMiddleware} from "./middlewares/resolve-time"
+import { authChecker } from "./authorization/auth-checker";
+import { AddCatInput } from "./src/entity/CatType";
 // import { CatResolverInheritance } from "./src/resolvers/CatResolverInheritance";
 
 
@@ -19,27 +20,33 @@ async function bootstrap() {
   // build TypeGraphQL executable schema
   const schema = await buildSchema({
     resolvers: [CatResolver],
-    // emitSchemaFile: path.resolve(__dirname, "schema.gql"),
-    // globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware],
-    // container: Container,
-    // authChecker,
+    emitSchemaFile: path.resolve(__dirname, "schema.gql"),
+    globalMiddlewares: [ErrorLoggerMiddleware, ResolveTimeMiddleware],
+    container: Container,
+    authChecker,
   });
 
   // Create GraphQL server
-  const server = new ApolloServer({ schema,
-    // context: () => {
-    //   const ctx: Context = {
-    //     // create mocked user in context
-    //     // in real app you would be mapping user from `req.user` or sth
-    //     user: {
-    //       id: 1,
-    //       name: "Sample user",
-    //       roles: ["ADMIN"],
-    //     },
-    //   };
-    //   return ctx;
-    // },
-  }); 
+  const server = new ApolloServer({ 
+    schema,
+    playground: true, 
+    formatError: (err: any) => {
+      console.log("The Error is: ",err);
+      return err;
+    },
+    context: () => {
+      const ctx: Context = {
+        // create mocked user in context
+        // in real app you would be mapping user from `req.user` or sth
+        user: {
+          id: 1,
+          name: "Sample user",
+          roles: ["REGULAR"],
+        },
+      };
+      return ctx;
+    },
+  }as any); 
 
   // Start the server
   const { url } = await server.listen(4000);

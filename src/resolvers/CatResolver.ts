@@ -1,5 +1,5 @@
-import { Resolver, Query, Arg, Args, Mutation, Authorized, ArgsType } from "type-graphql";
-import { Cat, CatArgs, GetAllCats } from "../entity/CatType";
+import { Resolver, Query, Arg, Args, Mutation, Int, Authorized, ArgsType } from "type-graphql";
+import { AddCatInput, Cat, GetCatsArgs } from "../entity/CatType";
 import { AppDataSource } from "../data-source";
 import { Service } from "typedi"
 
@@ -7,7 +7,7 @@ import { Service } from "typedi"
 @Resolver()
 export class CatResolver {
   @Query(() => Cat)
-  async getCat(@Arg("id") id: number): Promise<Cat | undefined> { 
+  async getCat(@Arg("id", () => Int) id: number): Promise<Cat | undefined> { 
     const catRepository = AppDataSource.getRepository(Cat);
     const cat = await catRepository.findOneBy({id: id});
     if (!cat) {
@@ -17,18 +17,23 @@ export class CatResolver {
   }
 
   @Query(() => [Cat])
-  async getCats(@Args() {skip, take}: GetAllCats): Promise<Cat[]> {
+  async getCats(
+    @Arg("skip", () => Int) skip: number, 
+    @Arg("take", () => Int) take: number): Promise<Cat[]> {
     const catRepository = AppDataSource.getRepository(Cat);
-    return await catRepository.find({ skip: skip, take: take });
+    return await catRepository.find({ skip:skip, take: take });
   }
 
   @Mutation(() => Cat)
-  async addCat(@Args() { name, age, breed, color, energyLevel, temperament }: CatArgs
-  ): Promise<Cat> {
+  async addCat(
+  @Arg("name") name: string,
+  @Arg("age", () => Int) age: number,
+  @Arg("breed") breed: string,
+  @Arg("color") color: string,
+  @Arg("energyLevel", () => Int) energyLevel: number,
+  @Arg("temperament", () => [String]) temperament: string[]): Promise<Cat> {  
     const catRepository = AppDataSource.getRepository(Cat);
-    const catCount = await catRepository.count();
     const cat = new Cat();
-    cat.id = catCount + 1;
     cat.name = name;
     cat.age = age;
     cat.breed = breed;
@@ -39,9 +44,25 @@ export class CatResolver {
     return await catRepository.save(cat);
   }
 
-  // @Authorized()
+  @Mutation(() => Cat)
+  async addCat2(
+    @Arg("addCatInput", () => AddCatInput) addCatInput: AddCatInput
+    ): Promise<Cat> {    
+    const catRepository = AppDataSource.getRepository(Cat);
+    const cat = new Cat();
+    cat.name = addCatInput.name;
+    cat.age = addCatInput.age;
+    cat.breed = addCatInput.breed;
+    cat.color = addCatInput.color;
+    cat.energyLevel  = addCatInput.energyLevel;
+    cat.temperament = addCatInput.temperament;
+    cat.createdAt = new Date();
+    return await catRepository.save(cat);
+  }
+
+  @Authorized("ADMIN")
   @Mutation(() => Boolean)
-  async removeCat(@Arg("id") id: number): Promise<boolean> {
+  async removeCat(@Arg("id", () => Int) id: number): Promise<boolean> {
     const catRepository = AppDataSource.getRepository(Cat);
     const cat = await catRepository.findOneBy({id: id});
     if (!cat) {
@@ -51,8 +72,9 @@ export class CatResolver {
     return true;
   }
 
+  @Authorized()
   @Mutation(() => Cat)
-  async feedCat(@Arg("id") id: number): Promise<Cat | undefined> {
+  async feedCat(@Arg("id", () => Int) id: number): Promise<Cat | undefined> {
     const catRepository = AppDataSource.getRepository(Cat);
     const cat = await catRepository.findOneBy({id: id});
     if (!cat) {

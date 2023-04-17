@@ -26,15 +26,13 @@ let CatResolver = class CatResolver {
         }
         return cat;
     }
-    async getCats({ skip, take }) {
+    async getCats(skip, take) {
         const catRepository = data_source_1.AppDataSource.getRepository(CatType_1.Cat);
         return await catRepository.find({ skip: skip, take: take });
     }
-    async addCat({ name, age, breed, color, energyLevel, temperament }) {
+    async addCat(name, age, breed, color, energyLevel, temperament) {
         const catRepository = data_source_1.AppDataSource.getRepository(CatType_1.Cat);
-        const catCount = await catRepository.count();
         const cat = new CatType_1.Cat();
-        cat.id = catCount + 1;
         cat.name = name;
         cat.age = age;
         cat.breed = breed;
@@ -44,7 +42,18 @@ let CatResolver = class CatResolver {
         cat.createdAt = new Date();
         return await catRepository.save(cat);
     }
-    // @Authorized()
+    async addCat2(addCatInput) {
+        const catRepository = data_source_1.AppDataSource.getRepository(CatType_1.Cat);
+        const cat = new CatType_1.Cat();
+        cat.name = addCatInput.name;
+        cat.age = addCatInput.age;
+        cat.breed = addCatInput.breed;
+        cat.color = addCatInput.color;
+        cat.energyLevel = addCatInput.energyLevel;
+        cat.temperament = addCatInput.temperament;
+        cat.createdAt = new Date();
+        return await catRepository.save(cat);
+    }
     async removeCat(id) {
         const catRepository = data_source_1.AppDataSource.getRepository(CatType_1.Cat);
         const cat = await catRepository.findOneBy({ id: id });
@@ -66,35 +75,50 @@ let CatResolver = class CatResolver {
 };
 __decorate([
     (0, type_graphql_1.Query)(() => CatType_1.Cat),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.Int)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], CatResolver.prototype, "getCat", null);
 __decorate([
     (0, type_graphql_1.Query)(() => [CatType_1.Cat]),
-    __param(0, (0, type_graphql_1.Args)()),
+    __param(0, (0, type_graphql_1.Arg)("skip", () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Arg)("take", () => type_graphql_1.Int)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [CatType_1.GetAllCats]),
+    __metadata("design:paramtypes", [Number, Number]),
     __metadata("design:returntype", Promise)
 ], CatResolver.prototype, "getCats", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => CatType_1.Cat),
-    __param(0, (0, type_graphql_1.Args)()),
+    __param(0, (0, type_graphql_1.Arg)("name")),
+    __param(1, (0, type_graphql_1.Arg)("age", () => type_graphql_1.Int)),
+    __param(2, (0, type_graphql_1.Arg)("breed")),
+    __param(3, (0, type_graphql_1.Arg)("color")),
+    __param(4, (0, type_graphql_1.Arg)("energyLevel", () => type_graphql_1.Int)),
+    __param(5, (0, type_graphql_1.Arg)("temperament", () => [String])),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [CatType_1.CatArgs]),
+    __metadata("design:paramtypes", [String, Number, String, String, Number, Array]),
     __metadata("design:returntype", Promise)
 ], CatResolver.prototype, "addCat", null);
 __decorate([
+    (0, type_graphql_1.Mutation)(() => CatType_1.Cat),
+    __param(0, (0, type_graphql_1.Arg)("addCatInput", () => CatType_1.AddCatInput)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [CatType_1.AddCatInput]),
+    __metadata("design:returntype", Promise)
+], CatResolver.prototype, "addCat2", null);
+__decorate([
+    (0, type_graphql_1.Authorized)("ADMIN"),
     (0, type_graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.Int)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], CatResolver.prototype, "removeCat", null);
 __decorate([
+    (0, type_graphql_1.Authorized)(),
     (0, type_graphql_1.Mutation)(() => CatType_1.Cat),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    __param(0, (0, type_graphql_1.Arg)("id", () => type_graphql_1.Int)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
